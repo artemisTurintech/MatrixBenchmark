@@ -1,8 +1,8 @@
 # Commands
 
 Run all commands from the repository root. Each is a single line with no shell operators, so
-it works unchanged in PowerShell (including Windows PowerShell 5.1), cmd, Git Bash, and on the
-Artemis runner.
+it works unchanged in cmd (the Artemis runner's shell), PowerShell (including Windows
+PowerShell 5.1), and Git Bash.
 
 Test and Benchmark run whatever is in `build/`, so run Compile first after any source change
 to make sure they reflect the repository as it is now.
@@ -29,11 +29,24 @@ ctest --test-dir build --output-on-failure
 
 Runs the `matrix_tests` target (`tests/test_matrix.cpp`).
 
+## Compile and test in one line
+
+```bash
+cmake --workflow --preset compile-and-test --fresh
+```
+
+Runs Compile then Test (the `compile-and-test` workflow in `CMakePresets.json`), stopping
+with a non-zero exit at the first failure.
+
 ## Benchmark
 
 ```bash
-./build/benchmark
+cmake -E chdir . build/benchmark
 ```
+
+`cmake -E chdir` launches the executable directly instead of through the shell, so the same
+line works in cmd (which the Artemis runner uses), PowerShell, and Git Bash. A plain
+`./build/benchmark` fails in cmd, and `build\benchmark` fails in Git Bash.
 
 Multiplies two 1024×1024 matrices with each method (Naive, Transpose, Tiled, Parallel) and
 prints the time for each and its speedup over Naive.
